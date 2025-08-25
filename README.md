@@ -18,7 +18,7 @@ Follow these steps to set up the project:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/supercrafts/DEX-Ultrax.git
+   git clone https://github.com/michaelalverez85/dex-platform.git
    ```
 
 2. Navigate to the project directory
